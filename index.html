@@ -3,59 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Immunforsvarets Borg - Minispill V2</title>
+    <title>Immunforsvarets Borg</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f0f4f8; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background-color: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; margin-top: 20px; width: 90%; max-width: 1000px; display: flex; flex-direction: column; align-items: center; }
-        #game-area { position: relative; width: 100%; max-width: 800px; height: 500px; margin-bottom: 20px; border: 2px solid #ddd; border-radius: 10px; overflow: hidden; background-color: #e0f2f7; }
-        /* Bakgrunnsfarge for himmel satt direkte på SVG */
-        #fortress-svg { width: 100%; height: 100%; background-color: #87CEEB; }
-        
-        .log-entry { background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; font-size: 0.9em; }
-        
-        .bacterium {
-            position: absolute;
-            width: 20px; /* Litt større bakterier */
-            height: 20px;
-            background-color: #8b0000; /* Mørkere rød for "slem" look */
-            border-radius: 50%;
-            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4); /* 3D effekt */
-            opacity: 0;
-            transition: transform linear, opacity linear;
-            z-index: 10;
-        }
-        /* Legger til små "pigger" på bakteriene med CSS */
-        .bacterium::after {
-             content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
-             border: 2px dotted #ff5252; border-radius: 50%; animation: spin 4s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-
-        /* SVG styles for interactive elements */
-        /* Vi bruker ID-ene på grupper (<g>) nå, så vi styler alle stier inni dem */
-        #wall path, #moat path, #macrophage path, #dendritic path, #t-helper path, #b-cell path,
-        #macrophage circle, #t-helper rect, #b-cell rect {
-            transition: fill 0.5s ease-in-out, stroke 0.5s ease-in-out, filter 0.5s ease-in-out;
-        }
-
-        .highlighted path, .highlighted circle, .highlighted rect {
-            /* En kraftigere "glød" effekt for highlighting */
-            filter: drop-shadow(0 0 8px gold);
-            stroke: #FFD700 !important;
-            stroke-width: 3px !important;
-        }
-         /* Spesifikk highlight farge for ulike elementer hvis vi ønsker det senere, 
-            men beholder gull-gløden som fellesnevner nå */
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
 
     <header class="w-full bg-slate-800 text-white py-8 shadow-lg text-center">
-        <h1 class="text-4xl font-bold italic">🏰 Immunforsvarets Borg V2</h1>
+        <h1 class="text-4xl font-bold italic">🏰 Immunforsvarets Borg</h1>
         <p class="mt-2 text-slate-300">Et pedagogisk minispill om kroppens forsvar</p>
-        <button id="startButton" class="mt-5 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-xl">
+        <button id="actionButton" class="mt-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-xl">
             START ANGREP!
         </button>
     </header>
@@ -64,15 +22,12 @@
         <div id="game-area">
             <svg id="fortress-svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
                 <rect x="0" y="350" width="800" height="150" fill="#4CAF50"/>
-                
                 <circle cx="720" cy="80" r="40" fill="#FFD700" stroke="#FFA500" stroke-width="2"/>
-
                 <g id="moat">
                     <path d="M50 350 L750 350 Q 760 370 750 390 L 700 410 L 100 410 L 50 390 Q 40 370 50 350 Z" fill="#03A9F4" stroke="#0288D1" stroke-width="2"/>
                     <path d="M60 360 Q 100 375 140 360 T 220 360 T 300 360 T 380 360 T 460 360 T 540 360 T 620 360 T 700 360" fill="none" stroke="white" stroke-width="2" opacity="0.6"/>
                     <text x="400" y="435" font-size="16" fill="#0277BD" text-anchor="middle" font-weight="bold">Vollgraven (Slimhinner)</text>
                 </g>
-
                 <g id="wall" transform="translate(150, 100)">
                     <rect x="50" y="50" width="400" height="200" fill="#9E9E9E" stroke="#616161" stroke-width="3"/>
                     <rect x="0" y="0" width="60" height="250" fill="#757575" stroke="#616161" stroke-width="3"/>
@@ -84,20 +39,23 @@
                     <path d="M60 100 H440 M60 150 H190 M310 150 H440 M60 200 H190 M310 200 H440" stroke="#616161" stroke-width="1" opacity="0.5"/>
                     <text x="250" y="280" font-size="20" fill="#424242" text-anchor="middle" font-weight="bold">Borgmuren (Huden)</text>
                 </g>
-
                 <g id="b-cell" transform="translate(200, 180)">
                     <rect x="0" y="20" width="80" height="60" fill="#795548"/>
                     <polygon points="0,20 40,0 80,20" fill="#5D4037"/>
                     <rect x="60" y="5" width="15" height="20" fill="#4E342E"/>
                     <circle cx="75" cy="0" r="8" fill="#BDBDBD" opacity="0.7"/>
-                    <path d="M20 60 L60 60 L55 70 L25 70 Z" fill="#212121"/> <path d="M25 50 L55 50 L65 60 L15 60 Z" fill="#424242"/> <text x="40" y="95" font-size="14" fill="white" text-anchor="middle" font-weight="bold" style="text-shadow: 1px 1px 2px black;">Smia (B-celle)</text>
+                    <path d="M20 60 L60 60 L55 70 L25 70 Z" fill="#212121"/>
+                    <path d="M25 50 L55 50 L65 60 L15 60 Z" fill="#424242"/>
+                    <text x="40" y="95" font-size="14" fill="white" text-anchor="middle" font-weight="bold" style="text-shadow: 1px 1px 2px black;">Smia (B-celle)</text>
                 </g>
-
                 <g id="t-helper" transform="translate(595, 90)">
-                     <rect x="10" y="20" width="30" height="40" fill="#E91E63" rx="5"/> <circle cx="25" cy="20" r="12" fill="#F8BBD0"/> <path d="M15 15 L35 15 L25 0 Z" fill="gold"/> <path d="M10 30 Q -5 40 10 60" fill="none" stroke="#C2185B" stroke-width="3"/> <text x="25" y="80" font-size="14" fill="white" text-anchor="middle" font-weight="bold" style="text-shadow: 1px 1px 2px black;">General</text>
+                    <rect x="10" y="20" width="30" height="40" fill="#E91E63" rx="5"/>
+                    <circle cx="25" cy="20" r="12" fill="#F8BBD0"/>
+                    <path d="M15 15 L35 15 L25 0 Z" fill="gold"/>
+                    <path d="M10 30 Q -5 40 10 60" fill="none" stroke="#C2185B" stroke-width="3"/>
+                    <text x="25" y="80" font-size="14" fill="white" text-anchor="middle" font-weight="bold" style="text-shadow: 1px 1px 2px black;">General</text>
                 </g>
-                
-                 <g id="macrophage" transform="translate(280, 250)">
+                <g id="macrophage" transform="translate(280, 250)">
                     <path d="M-30 0 Q -40 -30 0 -40 Q 40 -30 30 0 Q 40 40 0 50 Q -40 40 -30 0 Z" fill="#66BB6A" stroke="#2E7D32" stroke-width="2"/>
                     <path d="M-15 -15 L -5 -10" stroke="black" stroke-width="2"/> <circle cx="-10" cy="-10" r="3" fill="black"/>
                     <path d="M5 -10 L 15 -15" stroke="black" stroke-width="2"/> <circle cx="10" cy="-10" r="3" fill="black"/>
@@ -105,13 +63,14 @@
                     <path d="M30 10 L 50 -10 Q 60 -20 70 -10 Q 80 0 70 10 L 50 30 Z" fill="#8D6E63" stroke="#5D4037"/>
                     <text x="0" y="70" font-size="14" fill="white" text-anchor="middle" font-weight="bold" style="text-shadow: 1px 1px 2px black;">Vakt-Troll</text>
                 </g>
-
-                <g id="dendritic" transform="translate(500, 280)">
+                 <g id="dendritic" transform="translate(500, 280)">
                     <path d="M-10 20 L 30 20 L 40 10 L 30 0 L -10 0 Q -20 10 -10 20 Z" fill="#FFECB3" stroke="#FFC107"/>
-                    <path d="M0 0 L 20 0 L 15 -25 L 5 -25 Z" fill="#FFC107"/> <circle cx="10" cy="-30" r="8" fill="#FFF8E1"/> <path d="M0 0 Q -15 10 0 25" fill="none" stroke="#FFA000" stroke-width="3"/> <path d="M15 -15 L 35 -25 M15 -15 L 30 -5" stroke="#FF6F00" stroke-width="2"/>
+                    <path d="M0 0 L 20 0 L 15 -25 L 5 -25 Z" fill="#FFC107"/>
+                    <circle cx="10" cy="-30" r="8" fill="#FFF8E1"/>
+                    <path d="M0 0 Q -15 10 0 25" fill="none" stroke="#FFA000" stroke-width="3"/>
+                    <path d="M15 -15 L 35 -25 M15 -15 L 30 -5" stroke="#FF6F00" stroke-width="2"/>
                      <text x="10" y="45" font-size="14" fill="white" text-anchor="middle" font-weight="bold" style="text-shadow: 1px 1px 2px black;">Speider</text>
                 </g>
-
             </svg>
         </div>
 
@@ -120,118 +79,9 @@
                 <span class="mr-2 text-blue-600">📜</span> Hendelseslogg
             </h2>
             <div id="log-container" class="space-y-3 max-h-64 overflow-y-auto">
-                <p class="log-entry">Borgen er rolig. Trykk "START ANGREP!" for å simulere...</p>
+                <p class="log-entry">Borgen er rolig. Trykk "START ANGREP!" for å starte simuleringen.</p>
             </div>
         </div>
     </div>
-
-    <script>
-        const startButton = document.getElementById('startButton');
-        const gameArea = document.getElementById('game-area');
-        const logContainer = document.getElementById('log-container');
-
-        // VIKTIG: IDs er uendret, så denne mappingen fungerer fortsatt!
-        const defenseElements = {
-            'moat': document.getElementById('moat'),
-            'wall': document.getElementById('wall'),
-            'macrophage': document.getElementById('macrophage'),
-            'dendritic': document.getElementById('dendritic'),
-            't-helper': document.getElementById('t-helper'),
-            'b-cell': document.getElementById('b-cell')
-        };
-
-        const simulationSteps = [
-            { id: 'bacterium-spawn', msg: "🦠 Bakterier dukker opp ved horisonten!", action: spawnBacterium, delay: 1000, count: 5 },
-            { id: 'moat', msg: "🌊 Fienden møter Vollgraven (Slimhinnene) og blir bremset!", action: highlightElement, delay: 2000, elm: 'moat' },
-            { id: 'bacterium-approach-wall', msg: "⚠️ Noen bakterier sniker seg over vollgraven og angriper porten!", action: moveBacteriaTo, delay: 2500, targetY: 280 },
-            { id: 'wall', msg: "🧱 Borgmuren (Huden) slår sprekker! Alarmen går!", action: highlightElement, delay: 2000, elm: 'wall' },
-            { id: 'macrophage', msg: "👹 Vakt-trollet (Makrofagen) stormer ut og begynner å slåss!", action: highlightElement, delay: 2500, elm: 'macrophage' },
-            { id: 'dendritic', msg: "🏇 Speideren (Dendrittisk celle) rir avgårde med informasjon om fienden!", action: highlightElement, delay: 2000, elm: 'dendritic' },
-            { id: 't-helper', msg: "👑 Generalen (T-hjelpecellen) i tårnet mottar beskjeden og legger en slagplan.", action: highlightElement, delay: 2500, elm: 't-helper' },
-            { id: 'b-cell', msg: "🔨 Smia (B-cellene) fyrer opp ovnen for å lage spesialvåpen (antistoffer)!", action: highlightElement, delay: 3000, elm: 'b-cell' },
-            { id: 'victory', msg: "✅ Fienden er bekjempet! Borgen er trygg igjen.", action: () => {}, delay: 1000 }
-        ];
-
-        let bacteria = [];
-
-        function addLogEntry(message) {
-            const entry = document.createElement('p');
-            entry.className = 'log-entry';
-            entry.innerHTML = message; // Bruker innerHTML for å tillate emojis
-            logContainer.prepend(entry);
-        }
-
-        function resetGame() {
-            logContainer.innerHTML = '<p class="log-entry">Borgen er rolig. Trykk "START ANGREP!" for å simulere...</p>';
-            bacteria.forEach(b => b.remove());
-            bacteria = [];
-            for (const key in defenseElements) {
-                defenseElements[key].classList.remove('highlighted');
-            }
-            startButton.disabled = false;
-        }
-
-        function spawnBacterium(count) {
-            for (let i = 0; i < count; i++) {
-                const b = document.createElement('div');
-                b.className = 'bacterium';
-                // Justert startposisjon for å passe den nye horisonten
-                b.style.left = `${Math.random() * (gameArea.offsetWidth - 40) + 20}px`;
-                b.style.top = `-30px`; 
-                gameArea.appendChild(b);
-                bacteria.push(b);
-                setTimeout(() => {
-                    b.style.opacity = 1;
-                    // Justert stopp-posisjon før vollgraven
-                    b.style.transform = `translateY(${360 + Math.random() * 30}px)`; 
-                }, i * 300);
-            }
-        }
-
-        function moveBacteriaTo(targetY) {
-            bacteria.forEach((b, index) => {
-                setTimeout(() => {
-                    b.style.transition = 'transform 3s ease-out'; // Litt jevnere bevegelse
-                    // Flytter dem til porten/muren
-                    b.style.transform = `translate(${350 + (Math.random() * 100) - 50}px, ${targetY + (Math.random() * 20) - 10}px)`; 
-                }, index * 200);
-            });
-        }
-
-        function highlightElement(elementId) {
-            // Fjerner highlight fra alle først for en renere sekvens
-            for (const key in defenseElements) {
-                defenseElements[key].classList.remove('highlighted');
-            }
-            // Legger til på det aktuelle elementet
-            defenseElements[elementId].classList.add('highlighted');
-        }
-
-        async function startSimulation() {
-            startButton.disabled = true;
-            resetGame(); 
-
-            for (const step of simulationSteps) {
-                addLogEntry(step.msg);
-                if (step.action === spawnBacterium) {
-                    step.action(step.count);
-                } else if (step.action === highlightElement) {
-                    step.action(step.elm);
-                } else if (step.action === moveBacteriaTo) {
-                    step.action(step.targetY);
-                }
-                await new Promise(resolve => setTimeout(resolve, step.delay));
-            }
-            // Fjerner siste highlight etter seier
-            setTimeout(() => {
-                 for (const key in defenseElements) {
-                    defenseElements[key].classList.remove('highlighted');
-                }
-            }, 2000);
-            startButton.disabled = false;
-        }
-
-        startButton.addEventListener('click', startSimulation);
-    </script>
 </body>
 </html>

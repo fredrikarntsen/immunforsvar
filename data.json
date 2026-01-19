@@ -1,0 +1,123 @@
+```
+
+{
+
+  "castle_model": {
+
+    "name": "Immunsystemets Borg",
+
+    "layers": [
+
+      {
+
+        "id": "outer_defense",
+
+        "title": "Det ytre forsvaret",
+
+        "roles": [
+
+          {
+
+            "biological_name": "Huden",
+
+            "castle_role": "Borgmuren",
+
+            "description": "En fysisk barriere som hindrer inntrengere i å komme inn."
+
+          },
+
+          {
+
+            "biological_name": "Slimhinner",
+
+            "castle_role": "Vollgraven",
+
+            "description": "Fanger fiender i en klebrig felle før de når muren."
+
+          }
+
+        ]
+
+      },
+
+      {
+
+        "id": "innate_immune_system",
+
+        "title": "Det medfødte forsvaret",
+
+        "roles": [
+
+          {
+
+            "biological_name": "Makrofager",
+
+            "castle_role": "Vakt-troll",
+
+            "description": "Store vakter som patruljerer og spiser alt som ser fremmed ut."
+
+          },
+
+          {
+
+            "biological_name": "Dendrittiske celler",
+
+            "castle_role": "Speidere",
+
+            "description": "Samler informasjon om fienden og rir til generalen med bevis."
+
+          }
+
+        ]
+
+      },
+
+      {
+
+        "id": "adaptive_immune_system",
+
+        "title": "Det tilpassede forsvaret",
+
+        "roles": [
+
+          {
+
+            "biological_name": "T-hjelpeceller",
+
+            "castle_role": "Generalen",
+
+            "description": "Mottar info fra speiderne og gir ordre til resten av hæren."
+
+          },
+
+          {
+
+            "biological_name": "B-celler",
+
+            "castle_role": "Våpensmia",
+
+            "description": "Lager spesiallagde piler (antistoffer) mot spesifikke fiender."
+
+          },
+
+          {
+
+            "biological_name": "Hukommelsesceller",
+
+            "castle_role": "Bibliotekarer",
+
+            "description": "Lagrer tegninger av fienden slik at de kan gjenkjennes raskt neste gang."
+
+          }
+
+        ]
+
+      }
+
+    ]
+
+  }
+
+}
+
+```

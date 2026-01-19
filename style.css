@@ -35,21 +35,32 @@ body { font-family: 'Arial', sans-serif; background-color: #f0f4f8; display: fle
     stroke: #FFD700 !important;
     stroke-width: 3px !important;
 }
-/* ... (behold alt det gamle over) ... */
 
-/* --- NYTT FOR ACTION-DELEN --- */
 
 /* Prosjektilet (Antistoffet/Pilen) */
 .projectile {
     position: absolute;
-    font-size: 24px;
+    font-size: 28px; /* Litt større */
     font-weight: bold;
-    color: #9C27B0; /* Samme lilla farge som B-cellen */
+    color: #9C27B0;
     z-index: 20;
-    pointer-events: none; /* Klikk går tvers gjennom */
-    /* Starter usynlig til vi fyrer av */
+    pointer-events: none;
+    /* Start-tilstand */
     transform: scale(0); 
-    transition: transform 0.5s ease-out, left 1s ease-in, top 1s ease-in;
+    /* Vi øker tiden til 2 sekunder (2s) for en tydeligere reise */
+    transition: transform 0.5s ease-out, left 2s linear, top 2s linear;
+}
+
+/* NYTT: Siktelinjen som viser banen */
+.trace-line {
+    position: absolute;
+    height: 2px;
+    background-color: #9C27B0; /* Samme farge som pilen */
+    opacity: 0.4;
+    transform-origin: 0 50%; /* Roterer ut fra venstre kant */
+    z-index: 15;
+    pointer-events: none;
+    box-shadow: 0 0 4px #E1BEE7;
 }
 
 /* Animasjon for bakterie som dør */

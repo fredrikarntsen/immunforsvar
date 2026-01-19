@@ -3,85 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forsvaret av Borgen: Immunforsvaret</title>
+    <title>Borg-forsvar: Immunsimulering</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .flip-card { perspective: 1000px; background-color: transparent; height: 200px; }
+        .flip-card { perspective: 1000px; height: 180px; }
         .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
-        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .active-defense { transform: rotateY(180deg); outline: 4px solid #facc15; border-radius: 10px; }
         .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; flex-direction: column; border-radius: 10px; padding: 15px; text-align: center; }
         .flip-card-front { background-color: #3b82f6; color: white; }
         .flip-card-back { background-color: #1e3a8a; color: white; transform: rotateY(180deg); }
+        #log-container { max-height: 200px; overflow-y: auto; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
 
-    <header class="bg-slate-800 text-white py-10 shadow-lg text-center">
-        <h1 class="text-4xl font-bold">Borgen: Kroppens Immunforsvar</h1>
-        <p class="mt-2 text-slate-300">Klikk på forsvarerne for å se deres biologiske rolle</p>
+    <header class="bg-slate-800 text-white py-8 shadow-lg text-center">
+        <h1 class="text-4xl font-bold italic">🛡️ Forsvaret av Borgen</h1>
+        <button onclick="startSimulation()" class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-xl">
+            SEND INN BAKTERIE-HÆREN!
+        </button>
     </header>
 
-    <main class="max-w-6xl mx-auto p-6">
-        <div id="content"></div>
+    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2">
+            <div id="content"></div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-inner border-2 border-slate-200">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <span class="mr-2">📜</span> Hendelsesforløp
+            </h2>
+            <div id="log-container" class="space-y-3 italic text-gray-700">
+                <p>Borgen er rolig. Ingen fiender i sikte...</p>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        // Her simulerer vi dataen fra JSON-filen din
         const data = {
             "layers": [
-                {
-                    "title": "Første forsvarslinje: Barrierene",
-                    "roles": [
-                        { "bio": "Huden", "castle": "Borgmuren", "desc": "Hindrer fysisk inntrengere i å komme inn." },
-                        { "bio": "Slimhinner", "castle": "Vollgraven", "desc": "Fanger fiender i en seig felle." }
-                    ]
-                },
-                {
-                    "title": "Andre forsvarslinje: Det medfødte",
-                    "roles": [
-                        { "bio": "Makrofager", "castle": "Vakt-trollene", "desc": "Store vakter som spiser alt fremmed de finner." },
-                        { "bio": "Dendrittiske celler", "castle": "Speiderne", "desc": "Samler bevis og varsler hovedkvarteret." }
-                    ]
-                },
-                {
-                    "title": "Tredje forsvarslinje: Det tilpassede",
-                    "roles": [
-                        { "bio": "T-hjelpeceller", "castle": "Generalen", "desc": "Dirigerer troppene og gir ordre om angrep." },
-                        { "bio": "B-celler", "castle": "Våpensmia", "desc": "Lager spesiallagde piler (antistoffer) mot fienden." },
-                        { "bio": "Hukommelsesceller", "castle": "Bibliotekarene", "desc": "Husker fienden for å reagere raskere neste gang." }
-                    ]
-                }
+                { "id": "muren", "bio": "Huden", "castle": "Borgmuren", "desc": "Fienden prøver å klatre over, men muren er tett!" },
+                { "id": "troll", "bio": "Makrofager", "castle": "Vakt-trollene", "desc": "Trollene våkner og spiser de første inntrengerne!" },
+                { "id": "speider", "bio": "Dendrittiske celler", "castle": "Speiderne", "desc": "Speiderne rir til hovedstaden med fiendens våpenskjold." },
+                { "id": "general", "bio": "T-hjelpeceller", "castle": "Generalen", "desc": "Generalen ser våpenskjoldet og gir ordre om full mobilisering!" },
+                { "id": "smi", "bio": "B-celler", "castle": "Våpensmia", "desc": "Smien lager tusenvis av piler tilpasset akkurat denne fienden!" }
             ]
         };
 
-        const container = document.getElementById('content');
-
-        data.layers.forEach(layer => {
-            const section = document.createElement('section');
-            section.className = "mb-12";
-            
-            section.innerHTML = `
-                <h2 class="text-2xl font-semibold mb-6 border-b-2 border-slate-300 pb-2">${layer.title}</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    ${layer.roles.map(role => `
-                        <div class="flip-card">
-                            <div class="flip-card-inner shadow-md">
-                                <div class="flip-card-front">
-                                    <span class="text-sm uppercase tracking-widest opacity-75">Borg-rolle</span>
-                                    <h3 class="text-2xl font-bold">${role.castle}</h3>
-                                </div>
-                                <div class="flip-card-back">
-                                    <span class="text-sm uppercase tracking-widest opacity-75">Biologisk celle</span>
-                                    <h3 class="text-xl font-bold mb-2">${role.bio}</h3>
-                                    <p class="text-sm">${role.desc}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
+        // Tegn kortene
+        const content = document.getElementById('content');
+        data.layers.forEach(role => {
+            const card = document.createElement('div');
+            card.className = "flip-card mb-4";
+            card.id = `card-${role.id}`;
+            card.innerHTML = `
+                <div class="flip-card-inner shadow-md" id="inner-${role.id}">
+                    <div class="flip-card-front">
+                        <h3 class="text-xl font-bold">${role.castle}</h3>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3 class="text-lg font-bold">${role.bio}</h3>
+                        <p class="text-xs">${role.desc}</p>
+                    </div>
                 </div>
             `;
-            container.appendChild(section);
+            content.appendChild(card);
         });
+
+        function addLog(msg, color="text-gray-700") {
+            const log = document.getElementById('log-container');
+            const p = document.createElement('p');
+            p.className = `p-2 border-l-4 border-slate-300 bg-slate-50 ${color}`;
+            p.innerText = msg;
+            log.prepend(p);
+        }
+
+        async function startSimulation() {
+            // Nullstill
+            document.querySelectorAll('.flip-card-inner').forEach(c => c.classList.remove('active-defense'));
+            document.getElementById('log-container').innerHTML = "";
+            
+            const steps = [
+                { id: 'muren', msg: "⚔️ Bakteriene angriper! De prøver å finne hull i muren...", delay: 1000 },
+                { id: 'troll', msg: "👹 Inntrengere har kommet gjennom et sår! Vakt-trollene (Makrofager) angriper!", delay: 2000 },
+                { id: 'speider', msg: "🏇 Speiderne (Dendrittiske celler) fanger en fiende og rir til generalen!", delay: 2000 },
+                { id: 'general', msg: "👑 Generalen (T-hjelpeceller) analyserer trusselen og roper på forsterkninger!", delay: 2000 },
+                { id: 'smi', msg: "🏹 Våpensmia (B-celler) pumper ut målrettede antistoff-piler. Seieren er nær!", delay: 2000 }
+            ];
+
+            for (const step of steps) {
+                addLog(step.msg, "text-blue-900 font-semibold");
+                document.getElementById(`inner-${step.id}`).classList.add('active-defense');
+                await new Promise(r => setTimeout(r, step.delay));
+            }
+            
+            addLog("✅ Fienden er bekjempet! Bibliotekarene (Hukommelsesceller) arkiverer info.", "text-green-600 font-bold");
+        }
     </script>
 </body>
 </html>

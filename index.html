@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forsvaret av Borgen: Immunforsvaret</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .flip-card { perspective: 1000px; background-color: transparent; height: 200px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; flex-direction: column; border-radius: 10px; padding: 15px; text-align: center; }
+        .flip-card-front { background-color: #3b82f6; color: white; }
+        .flip-card-back { background-color: #1e3a8a; color: white; transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <header class="bg-slate-800 text-white py-10 shadow-lg text-center">
+        <h1 class="text-4xl font-bold">Borgen: Kroppens Immunforsvar</h1>
+        <p class="mt-2 text-slate-300">Klikk på forsvarerne for å se deres biologiske rolle</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6">
+        <div id="content"></div>
+    </main>
+
+    <script>
+        // Her simulerer vi dataen fra JSON-filen din
+        const data = {
+            "layers": [
+                {
+                    "title": "Første forsvarslinje: Barrierene",
+                    "roles": [
+                        { "bio": "Huden", "castle": "Borgmuren", "desc": "Hindrer fysisk inntrengere i å komme inn." },
+                        { "bio": "Slimhinner", "castle": "Vollgraven", "desc": "Fanger fiender i en seig felle." }
+                    ]
+                },
+                {
+                    "title": "Andre forsvarslinje: Det medfødte",
+                    "roles": [
+                        { "bio": "Makrofager", "castle": "Vakt-trollene", "desc": "Store vakter som spiser alt fremmed de finner." },
+                        { "bio": "Dendrittiske celler", "castle": "Speiderne", "desc": "Samler bevis og varsler hovedkvarteret." }
+                    ]
+                },
+                {
+                    "title": "Tredje forsvarslinje: Det tilpassede",
+                    "roles": [
+                        { "bio": "T-hjelpeceller", "castle": "Generalen", "desc": "Dirigerer troppene og gir ordre om angrep." },
+                        { "bio": "B-celler", "castle": "Våpensmia", "desc": "Lager spesiallagde piler (antistoffer) mot fienden." },
+                        { "bio": "Hukommelsesceller", "castle": "Bibliotekarene", "desc": "Husker fienden for å reagere raskere neste gang." }
+                    ]
+                }
+            ]
+        };
+
+        const container = document.getElementById('content');
+
+        data.layers.forEach(layer => {
+            const section = document.createElement('section');
+            section.className = "mb-12";
+            
+            section.innerHTML = `
+                <h2 class="text-2xl font-semibold mb-6 border-b-2 border-slate-300 pb-2">${layer.title}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${layer.roles.map(role => `
+                        <div class="flip-card">
+                            <div class="flip-card-inner shadow-md">
+                                <div class="flip-card-front">
+                                    <span class="text-sm uppercase tracking-widest opacity-75">Borg-rolle</span>
+                                    <h3 class="text-2xl font-bold">${role.castle}</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <span class="text-sm uppercase tracking-widest opacity-75">Biologisk celle</span>
+                                    <h3 class="text-xl font-bold mb-2">${role.bio}</h3>
+                                    <p class="text-sm">${role.desc}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(section);
+        });
+    </script>
+</body>
+</html>

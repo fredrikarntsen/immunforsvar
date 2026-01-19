@@ -141,48 +141,67 @@ function highlightElement(elementId) {
 
 // --- LOGIKK FOR ANGREP (ACTION!) ---
 
+
 function fireWeapons() {
-    // 1. Finn startposisjonen til B-cellen (Smia)
     const bCell = defenseElements['b-cell'].getBoundingClientRect();
     const gameAreaRect = gameArea.getBoundingClientRect();
     
-    // Beregn startkoordinater relativt til spillområdet
+    // Beregn startkoordinater (senter av Smia)
     const startX = bCell.left - gameAreaRect.left + bCell.width / 2;
     const startY = bCell.top - gameAreaRect.top + bCell.height / 2;
 
-    // 2. Skyt på hver levende bakterie
     bacteria.forEach((bact, index) => {
-        // Lag prosjektilet
+        // Hent målets posisjon (vi bruker dataset hvis lagret, eller live posisjon)
+        const bactRect = bact.getBoundingClientRect();
+        // Vi sikter på midten av bakterien
+        const targetX = (bactRect.left - gameAreaRect.left) + 10; 
+        const targetY = (bactRect.top - gameAreaRect.top) + 10;
+
+        // 1. Tegn siktelinjen (Trace) først
+        createTraceLine(startX, startY, targetX, targetY);
+
+        // 2. Klargjør prosjektilet
         const projectile = document.createElement('div');
         projectile.className = 'projectile';
-        projectile.innerText = 'Y'; // Antistoffer er Y-formede!
-        
-        // Sett startposisjon
+        projectile.innerText = 'Y';
         projectile.style.left = `${startX}px`;
         projectile.style.top = `${startY}px`;
         gameArea.appendChild(projectile);
 
-        // Hent målets (bakteriens) posisjon
-        // Vi må bruke transform-verdiene vi satte tidligere, eller getBoundingClientRect
-        const bactRect = bact.getBoundingClientRect();
-        const targetX = bactRect.left - gameAreaRect.left;
-        const targetY = bactRect.top - gameAreaRect.top;
+        // 3. Vent litt så eleven ser siktelinjen, SÅ skyt!
+        // Forsinkelsen øker for hver bakterie så de ikke skyter helt likt (maskingevær-effekt)
+        const delay = 300 + (index * 400); 
 
-        // 3. Animer flyturen
-        // Vi bruker setTimeout for å sikre at browseren tegner startposisjonen før den animerer
         setTimeout(() => {
-            projectile.style.transform = 'scale(1) rotate(180deg)'; // Roter så "Y" ser ut som en pil nedover/bortover
-            projectile.style.left = `${targetX}px`;
-            projectile.style.top = `${targetY}px`;
-        }, 50 + (index * 100)); // Litt forsinkelse mellom hvert skudd for "maskingevær"-effekt
+            // "requestAnimationFrame" sikrer at nettleseren har tegnet startposisjonen
+            // før vi endrer den. Dette fikser problemet med at animasjonen "hopper".
+            requestAnimationFrame(() => {
+                // Roter pilen så den peker mot målet
+                // Math.atan2 gir oss vinkelen mellom to punkter
+                const angle = Math.atan2(targetY - startY, targetX - startX) * (180 / Math.PI);
+                
+                // Sett sluttposisjon og rotasjon
+                // Vi legger til 90 grader fordi teksten "Y" står oppreist
+                projectile.style.transform = `scale(1) rotate(${angle + 90}deg)`;
+                projectile.style.left = `${targetX}px`;
+                projectile.style.top = `${targetY}px`;
+            });
+        }, delay);
 
-        // 4. Når prosjektilet treffer (etter 1 sekund transition)
+        // 4. Treffet (må matche CSS transition tiden som nå er 2s = 2000ms)
         setTimeout(() => {
-            projectile.remove(); // Fjern pilen
-            killBacterium(bact); // Drep bakterien
-        }, 1050 + (index * 100));
+            projectile.remove(); // Fjern pil
+            killBacterium(bact); // Drep bakterie
+            
+            // Fjern siktelinjene også for å rydde opp
+            const traces = document.querySelectorAll('.trace-line');
+            traces.forEach(t => t.remove());
+            
+        }, delay + 2000); 
     });
 }
+
+
 
 function killBacterium(bact) {
     bact.classList.add('dying');
@@ -204,3 +223,19 @@ function victoryEffect() {
 }
 
 actionButton.addEventListener('click', nextStep);
+
+// --- LEGG TIL DENNE NYE HJELPEFUNKSJONEN NEDERST I FILEN ---
+
+function createTraceLine(x1, y1, x2, y2) {
+    const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+    const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+    const line = document.createElement('div');
+    line.className = 'trace-line';
+    line.style.width = `${length}px`;
+    line.style.left = `${x1}px`;
+    line.style.top = `${y1}px`;
+    line.style.transform = `rotate(${angle}deg)`;
+    
+    gameArea.appendChild(line);
+}

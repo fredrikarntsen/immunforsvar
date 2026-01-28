@@ -239,3 +239,80 @@ function createTraceLine(x1, y1, x2, y2) {
     
     gameArea.appendChild(line);
 }
+
+// ... (behold all koden for simuleringen som vi lagde sist) ...
+
+/* --- NYTT: FAKTA-DATABASE OG POPUP LOGIKK --- */
+
+// Her lagrer vi informasjonen som skal vises i popup-en
+const infoData = {
+    'moat': {
+        title: "Vollgraven",
+        subtitle: "Slimhinnene",
+        desc: "Slimhinnene i nesen, halsen og lungene er kroppens første felle. Akkurat som en vollgrav fanger fiender i vannet, fanger slimet bakterier og virus før de kommer inn i kroppen."
+    },
+    'wall': {
+        title: "Borgmuren",
+        subtitle: "Huden",
+        desc: "Huden er en tett, fysisk barriere som dekker hele kroppen. Den er som en tykk steinmur som bakterier ikke kan trenge gjennom så lenge den er hel (uten sår)."
+    },
+    'macrophage': {
+        title: "Vakt-Troll",
+        subtitle: "Makrofag (Ete-celle)",
+        desc: "Store celler som patruljerer i vevet. De fungerer som vaktposter som spiser alt de ikke kjenner igjen. Navnet betyr faktisk 'storspiser'!"
+    },
+    'dendritic': {
+        title: "Speider",
+        subtitle: "Dendrittisk celle",
+        desc: "Disse cellene er informasjonsjegere. De tar biter av fienden og løper raskt til lymfeknutene for å vise dem frem til Generalen (T-cellene)."
+    },
+    't-helper': {
+        title: "General",
+        subtitle: "T-hjelpecelle",
+        desc: "Sjefen for det tilpassede forsvaret. Den dreper ikke selv, men den bestemmer hvilke våpen som skal brukes og aktiverer resten av hæren."
+    },
+    'b-cell': {
+        title: "Smia",
+        subtitle: "B-celle",
+        desc: "Disse cellene er fabrikker. Når de får ordre fra Generalen, forvandles de til plasmaceller som spruter ut tusenvis av antistoffer (piler) i sekundet."
+    }
+};
+
+// Hent modal-elementene
+const modal = document.getElementById('info-modal');
+const modalTitle = document.getElementById('modal-title');
+const modalSubtitle = document.getElementById('modal-subtitle');
+const modalDesc = document.getElementById('modal-desc');
+
+// Funksjon for å åpne modalen
+function openModal(elementId) {
+    const data = infoData[elementId];
+    if (data) {
+        modalTitle.innerText = data.title;
+        modalSubtitle.innerText = data.subtitle;
+        modalDesc.innerText = data.desc;
+        
+        // Vis modalen
+        modal.classList.remove('hidden');
+    }
+}
+
+// Funksjon for å lukke modalen
+function closeModal() {
+    modal.classList.add('hidden');
+}
+
+// Koble klikk på figurene til åpning av modal
+// Vi bruker defenseElements-listen vi allerede har laget øverst i scriptet!
+for (const key in defenseElements) {
+    defenseElements[key].addEventListener('click', () => {
+        openModal(key);
+    });
+}
+
+// Lukk modalen hvis man klikker på den mørke bakgrunnen (utenfor boksen)
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        closeModal();
+    }
+});

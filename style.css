@@ -103,3 +103,24 @@ body { font-family: 'Arial', sans-serif; background-color: #f0f4f8; display: fle
     filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); 
     /* Ingen transform/scale her! */
 }
+
+/* Animasjon for når Trollet tygger */
+.chewing {
+    animation: chew-anim 0.3s ease-in-out 4; /* Tygg 4 ganger */
+    transform-origin: center;
+}
+
+@keyframes chew-anim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(5deg); }
+    100% { transform: scale(1); }
+}
+
+/* Informasjonspakken (Antigen) */
+.info-packet {
+    position: absolute;
+    font-size: 24px;
+    z-index: 30;
+    pointer-events: none;
+    transition: all 1.5s ease-in-out;
+}

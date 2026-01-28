@@ -55,16 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+
     // Simuleringstrinnene
     const simulationSteps = [
         { id: 'spawn', msg: "🦠 <strong>Trinn 1:</strong> Bakterier dukker opp ved horisonten!", action: spawnBacterium, count: 5 },
         { id: 'moat', msg: "🌊 <strong>Trinn 2:</strong> Det ytre forsvaret (Slimhinner/Vollgrav) bremser fienden.", action: highlightElement, elm: 'moat' },
         { id: 'approach', msg: "⚠️ <strong>Trinn 3:</strong> Bakteriene bryter igjennom det første forsvaret!", action: moveBacteriaTo, targetY: 280 },
         { id: 'wall', msg: "🧱 <strong>Trinn 4:</strong> Huden (Borgmuren) brytes. Alarm!", action: highlightElement, elm: 'wall' },
-        { id: 'macrophage', msg: "👹 <strong>Trinn 5:</strong> Det medfødte forsvaret (Vakt-troll) prøver å holde stand!", action: highlightElement, elm: 'macrophage' },
-        { id: 'dendritic', msg: "🏇 <strong>Trinn 6:</strong> Speidere (Dendrittiske celler) henter informasjon.", action: highlightElement, elm: 'dendritic' },
-        { id: 't-helper', msg: "👑 <strong>Trinn 7:</strong> Generalen (T-hjelpeceller) mottar info og beordrer angrep.", action: highlightElement, elm: 't-helper' },
-        { id: 'attack', msg: "🏹 <strong>Trinn 8:</strong> Smia (B-celler) skyter antistoffer (piler) mot fienden!", action: fireWeapons },
+        { id: 'macrophage-eat', msg: "👹 <strong>Trinn 5:</strong> Vakt-trollet (Makrofagen) spiser inntrengere og analyserer dem!", action: trollAction },        
+        { id: 'dendritic', msg: "🏇 <strong>Trinn 6:</strong> Speideren (Dendrittisk celle) mottar informasjonen (antigenet).", action: highlightElement, elm: 'dendritic' },
+        { id: 't-helper', msg: "👑 <strong>Trinn 7:</strong> Generalen (T-hjelpeceller) får rapporten og beordrer angrep.", action: highlightElement, elm: 't-helper' },
+        { id: 'attack', msg: "🏹 <strong>Trinn 8:</strong> Smia (B-celler) skyter antistoffer (piler) mot resten av fienden!", action: fireWeapons },
         { id: 'win', msg: "✅ <strong>Seier:</strong> Infeksjonen er slått ned!", action: victoryEffect }
     ];
 
@@ -251,6 +252,84 @@ document.addEventListener('DOMContentLoaded', () => {
         defenseElements[elementId].classList.add('highlighted');
     }
 
+function trollAction() {
+        // 1. Highlight Trollet
+        highlightElement('macrophage');
+        
+        const trollGroup = defenseElements['macrophage']; // Hele <g> gruppen
+        // Vi må finne sentrum av trollet (Magen)
+        const trollRect = trollGroup.getBoundingClientRect();
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        
+        // Senterpunkt for trollet (relativt til spillområdet)
+        const trollX = (trollRect.left - gameAreaRect.left) + (trollRect.width / 2);
+        const trollY = (trollRect.top - gameAreaRect.top) + (trollRect.height / 2);
+
+        // 2. Finn de 2 nærmeste bakteriene for å spise dem (vi spiser ikke alle ennå!)
+        // Vi sorterer bakteriene basert på hvem som er nærmest trollet
+        const victims = bacteria.slice(0, 2); // Ta de to første i lista (forenklet)
+
+        victims.forEach((bact, index) => {
+            // Animer bevegelse inn i trollets munn
+            bact.style.transition = "all 1s ease-in";
+            bact.style.transform = `translate(${trollX - 30}px, ${trollY - 30}px) scale(0.5)`;
+            bact.style.opacity = "0.5";
+
+            // Når de kommer frem: Spis dem!
+            setTimeout(() => {
+                bact.remove();
+                // Fjern fra arrayet
+                bacteria = bacteria.filter(b => b !== bact);
+                
+                // Start tygge-animasjon på selve SVG-gruppen
+                // Vi legger klassen på <g>-elementet
+                trollGroup.classList.add('chewing');
+                
+                // Fjern tygge-klassen etter animasjonen er ferdig (1.2s)
+                setTimeout(() => {
+                    trollGroup.classList.remove('chewing');
+                }, 1200);
+
+            }, 1000); // Vent 1 sekund (mens de beveger seg til munnen)
+        });
+
+        // 3. Etter maten: Send informasjon (Skriftrull) til Speideren
+        setTimeout(() => {
+            sendInfoToScout(trollX, trollY);
+        }, 2000); // Vent til tyggingen er ferdig
+    }
+
+    function sendInfoToScout(startX, startY) {
+        // Lag informasjons-ikonet
+        const info = document.createElement('div');
+        info.className = 'info-packet';
+        info.innerText = '📜'; // En skriftrull (Analogi for Antigen)
+        info.style.left = `${startX}px`;
+        info.style.top = `${startY}px`;
+        gameArea.appendChild(info);
+
+        // Finn målet (Speideren)
+        const scoutRect = defenseElements['dendritic'].getBoundingClientRect();
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        const targetX = (scoutRect.left - gameAreaRect.left) + 20;
+        const targetY = (scoutRect.top - gameAreaRect.top) + 20;
+
+        // Animer flyturen
+        setTimeout(() => {
+            info.style.left = `${targetX}px`;
+            info.style.top = `${targetY}px`;
+            info.style.transform = "scale(1.5)"; // Gjør den litt større ved ankomst
+        }, 100);
+
+        // Når den kommer frem
+        setTimeout(() => {
+            info.remove();
+            // Highlight speideren for å vise at den har mottatt beskjeden
+            highlightElement('dendritic');
+            addLogEntry("ℹ️ Speideren har mottatt etterretning om fienden!");
+        }, 1600);
+    }
+    
     function fireWeapons() {
         const bCell = defenseElements['b-cell'].getBoundingClientRect();
         const gameAreaRect = gameArea.getBoundingClientRect();

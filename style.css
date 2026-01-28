@@ -81,3 +81,16 @@ body { font-family: 'Arial', sans-serif; background-color: #f0f4f8; display: fle
     50% { transform: scale(1.02); }
     100% { transform: scale(1); }
 }
+
+
+/* NYTT: Gjør at figurene ser klikkbare ut */
+#wall, #moat, #macrophage, #dendritic, #t-helper, #b-cell {
+    cursor: pointer; /* Endrer muspeker til en hånd */
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* En liten effekt når man holder musen over (Hover) */
+#wall:hover, #moat:hover, #macrophage:hover, #dendritic:hover, #t-helper:hover, #b-cell:hover {
+    filter: brightness(1.1); /* Gjør den litt lysere */
+    transform: scale(1.02);  /* Gjør den litt større */
+}

@@ -83,14 +83,23 @@ body { font-family: 'Arial', sans-serif; background-color: #f0f4f8; display: fle
 }
 
 
-/* NYTT: Gjør at figurene ser klikkbare ut */
+/* NYTT OG STABILT: Gjør at figurene ser klikkbare ut */
 #wall, #moat, #macrophage, #dendritic, #t-helper, #b-cell {
-    cursor: pointer; /* Endrer muspeker til en hånd */
-    transition: transform 0.2s ease, filter 0.2s ease;
+    cursor: pointer;
+    /* Sikrer at klikk treffer hele boksen til elementet */
+    pointer-events: bounding-box; 
+    /* Vi fjerner 'transform' fra transition for å unngå konflikt */
+    transition: filter 0.2s ease; 
 }
 
-/* En liten effekt når man holder musen over (Hover) */
+/* Backup for nettlesere som ikke støtter bounding-box */
+#wall *, #moat *, #macrophage *, #dendritic *, #t-helper *, #b-cell * {
+    pointer-events: visibleFill; 
+}
+
+/* En stabil effekt når man holder musen over (Hover) */
 #wall:hover, #moat:hover, #macrophage:hover, #dendritic:hover, #t-helper:hover, #b-cell:hover {
-    filter: brightness(1.1); /* Gjør den litt lysere */
-    transform: scale(1.02);  /* Gjør den litt større */
+    /* I stedet for å endre størrelse (som skaper dirring), gjør vi den lysere */
+    filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); 
+    /* Ingen transform/scale her! */
 }

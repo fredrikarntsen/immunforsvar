@@ -184,32 +184,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handlinger
     function spawnBacterium(count) {
-        for (let i = 0; i < count; i++) {
-            const b = document.createElement('div');
-            b.className = 'bacterium';
-            b.style.left = `${Math.random() * (gameArea.offsetWidth - 60) + 30}px`;
-            b.style.top = `-30px`; 
-            gameArea.appendChild(b);
-            bacteria.push(b);
-            setTimeout(() => {
-                b.style.opacity = 1;
-                b.style.transform = `translateY(${360 + Math.random() * 30}px)`; 
-            }, i * 100);
-        }
+    const areaWidth = gameArea.offsetWidth; // Hent bredden på spillområdet
+
+    for (let i = 0; i < count; i++) {
+        const b = document.createElement('div');
+        b.className = 'bacterium';
+        
+        // --- ENDRING HER ---
+        // Vi plasserer dem mellom 10% og 90% av bredden for å unngå kanter
+        // Math.random() gir tall mellom 0 og 1.
+        const randomX = (areaWidth * 0.1) + (Math.random() * (areaWidth * 0.8));
+        
+        b.style.left = `${randomX}px`;
+        b.style.top = `-30px`; // Starter rett over taket
+        
+        gameArea.appendChild(b);
+        bacteria.push(b);
+
+        // Animasjon ned til "horisonten" (før vollgraven)
+        setTimeout(() => {
+            b.style.opacity = 1;
+            // Beveger seg bare nedover (Y-aksen) i første trinn
+            // Vi varierer stoppestedet litt så de ikke står på en rett linje
+            b.style.transform = `translateY(${350 + Math.random() * 40}px)`; 
+        }, i * 150); // Litt raskere spawning for mer intensitet
     }
+}
 
     function moveBacteriaTo(targetY) {
-        bacteria.forEach((b, index) => {
-            setTimeout(() => {
-                b.style.transition = 'transform 2s ease-out';
-                const randomX = 350 + (Math.random() * 100) - 50;
-                const randomY = targetY + (Math.random() * 40) - 20;
-                b.style.transform = `translate(${randomX}px, ${randomY}px)`; 
-                b.dataset.x = randomX;
-                b.dataset.y = randomY;
-            }, index * 100);
-        });
-    }
+    const areaWidth = gameArea.offsetWidth;
+    const centerX = areaWidth / 2; // Dette er midten av borgen (X-aksen)
+
+    bacteria.forEach((b, index) => {
+        setTimeout(() => {
+            b.style.transition = 'transform 2.5s ease-in-out'; // Litt mykere bevegelse
+            
+            // Hvor er bakterien NÅ? (Vi må hente 'left' verdien vi satte i sted)
+            // parseFloat gjør om "123px" til tallet 123.
+            const startX = parseFloat(b.style.left);
+
+            // Hvor skal den? Mot midten (centerX), men med litt spredning (+/- 40px)
+            // så de ikke klumper seg oppå hverandre ved porten.
+            const targetX = centerX + (Math.random() * 80 - 40);
+
+            // Regn ut forskjellen (Delta) for å vite hvor mye vi skal flytte oss sideveis
+            const deltaX = targetX - startX;
+
+            // Flytt til målet!
+            // Vi bruker targetY (høyden) som før, men nå har vi en smart deltaX
+            b.style.transform = `translate(${deltaX}px, ${targetY + (Math.random() * 20)}px)`; 
+            
+            // Oppdater dataset slik at pilene (fireWeapons) vet hvor bakterien endte opp
+            // Merk: Når vi bruker translate, er posisjonen relativ til startX.
+            // Posisjonen på skjermen er startX + deltaX.
+            b.dataset.x = startX + deltaX;
+            b.dataset.y = targetY; // Ca posisjon
+            
+        }, index * 100);
+    });
+}
 
     function highlightElement(elementId) {
         for (const key in defenseElements) {

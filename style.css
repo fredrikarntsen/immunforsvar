@@ -124,3 +124,21 @@ body { font-family: 'Arial', sans-serif; background-color: #f0f4f8; display: fle
     pointer-events: none;
     transition: all 1.5s ease-in-out;
 }
+
+/* ... (resten av CSS er lik) ... */
+
+/* Lydbølger fra Generalens horn */
+.sound-wave {
+    position: absolute;
+    border: 3px solid #FFD700; /* Gullfarge */
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 25;
+    animation: ripple 1.5s ease-out infinite;
+}
+
+@keyframes ripple {
+    0% { transform: scale(0.1); opacity: 1; border-width: 3px; }
+    100% { transform: scale(2.5); opacity: 0; border-width: 0px; }
+}

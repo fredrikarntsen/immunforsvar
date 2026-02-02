@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // HER ER DEN NYE HANDLINGEN:
         { id: 'macrophage-eat', msg: "👹 <strong>Trinn 5:</strong> Vakt-trollet (Makrofagen) spiser inntrengere og analyserer dem!", action: trollAction },
         
-        { id: 'dendritic', msg: "🏇 <strong>Trinn 6:</strong> Speideren (Dendrittisk celle) mottar informasjonen (antigenet).", action: highlightElement, elm: 'dendritic' },
-        { id: 't-helper', msg: "👑 <strong>Trinn 7:</strong> Generalen (T-hjelpeceller) får rapporten og beordrer angrep.", action: highlightElement, elm: 't-helper' },
+        { id: 'scout-report', msg: "🏇 <strong>Trinn 6:</strong> Speideren rir til tårnet og leverer rapporten til Generalen.", action: scoutReport },
+        { id: 'general-command', msg: "👑 <strong>Trinn 7:</strong> Generalen blåser i hornet og sender tegninger til Smia!", action: generalCommand },
         { id: 'attack', msg: "🏹 <strong>Trinn 8:</strong> Smia (B-celler) skyter antistoffer (piler) mot resten av fienden!", action: fireWeapons },
         { id: 'win', msg: "✅ <strong>Seier:</strong> Infeksjonen er slått ned!", action: victoryEffect }
     ];
@@ -264,6 +264,100 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1600);
     }
 
+function scoutReport() {
+        highlightElement('dendritic');
+        
+        // Startposisjon (Speideren)
+        const scoutRect = defenseElements['dendritic'].getBoundingClientRect();
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        const startX = (scoutRect.left - gameAreaRect.left) + 20;
+        const startY = (scoutRect.top - gameAreaRect.top);
+
+        // Sluttposisjon (Generalen)
+        const generalRect = defenseElements['t-helper'].getBoundingClientRect();
+        const targetX = (generalRect.left - gameAreaRect.left) + 20;
+        const targetY = (generalRect.top - gameAreaRect.top) + 20;
+
+        // Lag skriftrullen
+        const info = document.createElement('div');
+        info.className = 'info-packet';
+        info.innerText = '📜'; 
+        info.style.left = `${startX}px`;
+        info.style.top = `${startY}px`;
+        gameArea.appendChild(info);
+
+        // Animer flyturen opp til tårnet
+        setTimeout(() => {
+            info.style.transition = "all 1.5s ease-in-out"; // Litt tregere, det er høyt opp!
+            info.style.left = `${targetX}px`;
+            info.style.top = `${targetY}px`;
+        }, 100);
+
+        // Når den kommer frem
+        setTimeout(() => {
+            info.remove();
+            highlightElement('t-helper'); // Generalen lyser opp
+            addLogEntry("👑 Generalen har lest rapporten!");
+        }, 1600);
+    }
+
+function generalCommand() {
+        const generalRect = defenseElements['t-helper'].getBoundingClientRect();
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        
+        const startX = (generalRect.left - gameAreaRect.left) + 25;
+        const startY = (generalRect.top - gameAreaRect.top) + 25;
+
+        // 1. VISUELLE LYDBØLGER (HORN)
+        // Vi lager 3 bølger med litt mellomrom
+        for(let i=0; i<3; i++) {
+            setTimeout(() => {
+                const wave = document.createElement('div');
+                wave.className = 'sound-wave';
+                wave.style.width = '20px';  // Starter smått
+                wave.style.height = '20px';
+                wave.style.left = `${startX - 10}px`; // Sentrer
+                wave.style.top = `${startY - 10}px`;
+                gameArea.appendChild(wave);
+                
+                // Fjern bølgen etter animasjonen
+                setTimeout(() => wave.remove(), 1500);
+            }, i * 400); // 400ms mellom hver bølge
+        }
+
+        // 2. SEND ORDRE TIL SMIA
+        // Vi venter litt til hornet har lydt
+        setTimeout(() => {
+            const bCellRect = defenseElements['b-cell'].getBoundingClientRect();
+            const targetX = (bCellRect.left - gameAreaRect.left) + 40;
+            const targetY = (bCellRect.top - gameAreaRect.top);
+
+            const order = document.createElement('div');
+            order.className = 'info-packet';
+            order.innerText = '📝'; // En kontrakt/tegning
+            // Gjør den blå for å skille fra skriftrullen
+            order.style.filter = "hue-rotate(180deg)"; 
+            order.style.left = `${startX}px`;
+            order.style.top = `${startY}px`;
+            gameArea.appendChild(order);
+
+            // Flyv ned til smia
+            setTimeout(() => {
+                order.style.transition = "all 1s ease-in"; // Raskere nedover
+                order.style.left = `${targetX}px`;
+                order.style.top = `${targetY}px`;
+            }, 50);
+
+            // Ankomst Smia
+            setTimeout(() => {
+                order.remove();
+                highlightElement('b-cell'); // Smia lyser opp
+                addLogEntry("🔨 Smia har mottatt byggetegningene!");
+            }, 1100);
+
+        }, 1000); // Starter etter 1 sekund (etter første lydbølge)
+    }
+    
     // --- ANGREP (Trinn 8) ---
     function fireWeapons() {
         const bCell = defenseElements['b-cell'].getBoundingClientRect();
